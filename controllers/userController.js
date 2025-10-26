@@ -114,6 +114,72 @@ class UserController {
     }
   }
 
+  // Login user
+  static async login(req, res) {
+    try {
+      const { email, password } = req.body;
+
+      // Validation
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email and password are required'
+        });
+      }
+
+      // Validate email format
+      if (!validateEmail(email)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid email address'
+        });
+      }
+
+      // Find user by email
+      const user = await User.findByEmail(email);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Verify password
+      const isPasswordValid = await user.verifyPassword(password);
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken(
+        { 
+          id: user.id, 
+          email: user.email,
+          employeeId: user.employeeId 
+        }, 
+        '7d'
+      );
+
+      // Return success response
+      res.json({
+        success: true,
+        message: 'Login successful',
+        user: user.toJSON(),
+        token
+      });
+
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error during login'
+      });
+    }
+  }
+
   // Get user profile
   static async getProfile(req, res) {
     try {
