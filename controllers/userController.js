@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import pool from '../config/db.js';
 import { validateEmail, validateLength } from '../utils/validation.js';
 import { generateToken } from '../utils/tokens.js';
 

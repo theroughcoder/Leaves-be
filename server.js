@@ -12,6 +12,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+console.log("oka")
 app.use("/api/users", userRouter);
 
 
