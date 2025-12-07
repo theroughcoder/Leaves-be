@@ -5,7 +5,7 @@ import authenticateToken from '../middleware/auth.js';
 const router = express.Router();
 
 // Register route
-router.post('/register', UserController.register);
+router.post('/admin/register', UserController.register);
 
 // Login route
 router.post('/login', UserController.login);

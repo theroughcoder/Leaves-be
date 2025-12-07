@@ -9,7 +9,7 @@ class User {
     this.email = data.email;
     this.password = data.password;
     this.department = data.department;
-    this.position = data.position;
+    this.role = data.role;
     this.employeeId = data.employee_id;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
@@ -17,19 +17,19 @@ class User {
 
   // Create a new user
   static async create(userData) {
-    const { firstName, lastName, email, password, department, position, employeeId } = userData;
+    const { firstName, lastName, email, password, department, role, employeeId } = userData;
     
     // Hash the password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     const query = `
-      INSERT INTO users (first_name, last_name, email, password, department, position, employee_id, created_at, updated_at)
+      INSERT INTO users (first_name, last_name, email, password, department, role, employee_id, created_at, updated_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
       RETURNING *
     `;
     
-    const values = [firstName, lastName, email, hashedPassword, department, position, employeeId];
+    const values = [firstName, lastName, email, hashedPassword, department, role, employeeId];
     
     try {
       const result = await pool.query(query, values);

@@ -7,10 +7,10 @@ class UserController {
   // Register a new user
   static async register(req, res) {
     try {
-      const { firstName, lastName, email, password, department, position, employeeId } = req.body;
+      const { firstName, lastName, email, password, department, role, employeeId } = req.body;
 
       // Validation
-      if (!firstName || !lastName || !email || !password || !department || !position || !employeeId) {
+      if (!firstName || !lastName || !email || !password || !department || !role || !employeeId) {
         return res.status(400).json({
           success: false,
           message: 'All fields are required'
@@ -66,7 +66,7 @@ class UserController {
         email,
         password,
         department,
-        position,
+        role,
         employeeId
       };
 
@@ -211,7 +211,7 @@ class UserController {
   static async updateProfile(req, res) {
     try {
       const userId = req.user.id;
-      const { firstName, lastName, department, position } = req.body;
+      const { firstName, lastName, department, role } = req.body;
 
       // Validation
       if (firstName && !validateLength(firstName, 2, 50)) {
@@ -247,9 +247,9 @@ class UserController {
         values.push(department);
       }
 
-      if (position) {
-        updateFields.push(`position = $${paramCount++}`);
-        values.push(position);
+      if (role) {
+        updateFields.push(`role = $${paramCount++}`);
+        values.push(role);
       }
 
       if (updateFields.length === 0) {
