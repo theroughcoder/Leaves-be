@@ -77,7 +77,8 @@ class UserController {
         { 
           id: newUser.id, 
           email: newUser.email,
-          employeeId: newUser.employeeId 
+          employeeId: newUser.employeeId,
+          role: newUser.role,
         }, 
         '7d'
       );
@@ -159,7 +160,8 @@ class UserController {
         { 
           id: user.id, 
           email: user.email,
-          employeeId: user.employeeId 
+          employeeId: user.employeeId,
+          role: user.role,
         }, 
         '7d'
       );
@@ -284,6 +286,20 @@ class UserController {
         success: false,
         message: 'Internal server error'
       });
+    }
+  }
+
+  // Get all users [ADMIN]
+  static async getAllUsers(req, res) {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+      const users = await User.findAll();
+      res.json({ success: true, users: users.map(user => user.toJSON()) });
+    } catch (error) {
+      console.error('Get all users error:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
 }

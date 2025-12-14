@@ -16,4 +16,7 @@ router.get('/profile', authenticateToken, UserController.getProfile);
 // Update user profile route (protected)
 router.put('/profile', authenticateToken, UserController.updateProfile);
 
+// Get all users (admin only)
+router.get('/admin/users', authenticateToken, UserController.getAllUsers);
+
 export default router;

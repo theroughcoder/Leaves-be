@@ -84,6 +84,17 @@ class User {
     }
   }
 
+  // Fetch all users
+  static async findAll() {
+    const query = 'SELECT * FROM users ORDER BY created_at DESC';
+    try {
+      const result = await pool.query(query);
+      return result.rows.map(row => new User(row));
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Verify password
   async verifyPassword(password) {
     return await bcrypt.compare(password, this.password);
