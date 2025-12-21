@@ -11,25 +11,26 @@ class User {
     this.department = data.department;
     this.role = data.role;
     this.employeeId = data.employee_id;
+    this.managerId = data.manager_id;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
 
   // Create a new user
   static async create(userData) {
-    const { firstName, lastName, email, password, department, role, employeeId } = userData;
+    const { firstName, lastName, email, password, department, role, employeeId, managerId } = userData;
     
     // Hash the password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     const query = `
-      INSERT INTO users (first_name, last_name, email, password, department, role, employee_id, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+      INSERT INTO users (first_name, last_name, email, password, department, role, employee_id, manager_id, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
       RETURNING *
     `;
     
-    const values = [firstName, lastName, email, hashedPassword, department, role, employeeId];
+    const values = [firstName, lastName, email, hashedPassword, department, role, employeeId, managerId || null];
     
     try {
       const result = await pool.query(query, values);
@@ -87,6 +88,17 @@ class User {
   // Fetch all users
   static async findAll() {
     const query = 'SELECT * FROM users ORDER BY created_at DESC';
+    try {
+      const result = await pool.query(query);
+      return result.rows.map(row => new User(row));
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Fetch all managers (users with role 'manager' only)
+  static async findAllManagers() {
+    const query = "SELECT * FROM users WHERE role = 'manager' ORDER BY first_name, last_name";
     try {
       const result = await pool.query(query);
       return result.rows.map(row => new User(row));

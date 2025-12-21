@@ -7,13 +7,21 @@ class UserController {
   // Register a new user
   static async register(req, res) {
     try {
-      const { firstName, lastName, email, password, department, role, employeeId } = req.body;
+      const { firstName, lastName, email, password, department, role, employeeId, managerId } = req.body;
 
       // Validation
       if (!firstName || !lastName || !email || !password || !department || !role || !employeeId) {
         return res.status(400).json({
           success: false,
           message: 'All fields are required'
+        });
+      }
+
+      // Manager is required for employees, optional for admin/manager
+      if (role === 'employee' && !managerId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Manager is required for employee role'
         });
       }
 
@@ -59,6 +67,17 @@ class UserController {
         });
       }
 
+      // Validate manager exists if managerId is provided
+      if (managerId) {
+        const manager = await User.findById(managerId);
+        if (!manager) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid manager selected'
+          });
+        }
+      }
+
       // Create new user
       const userData = {
         firstName,
@@ -67,7 +86,8 @@ class UserController {
         password,
         department,
         role,
-        employeeId
+        employeeId,
+        managerId
       };
 
       const newUser = await User.create(userData);
@@ -299,6 +319,27 @@ class UserController {
       res.json({ success: true, users: users.map(user => user.toJSON()) });
     } catch (error) {
       console.error('Get all users error:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  }
+
+  // Get all managers (public endpoint for registration)
+  static async getAllManagers(req, res) {
+    try {
+      const managers = await User.findAllManagers();
+      res.json({ 
+        success: true, 
+        managers: managers.map(manager => ({
+          id: manager.id,
+          firstName: manager.firstName,
+          lastName: manager.lastName,
+          email: manager.email,
+          department: manager.department,
+          role: manager.role
+        }))
+      });
+    } catch (error) {
+      console.error('Get all managers error:', error);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }

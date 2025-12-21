@@ -19,4 +19,7 @@ router.put('/profile', authenticateToken, UserController.updateProfile);
 // Get all users (admin only)
 router.get('/admin/users', authenticateToken, UserController.getAllUsers);
 
+// Get all managers (public endpoint for registration)
+router.get('/managers', UserController.getAllManagers);
+
 export default router;
